@@ -1,0 +1,33 @@
+version: "3.3"
+
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  web:
+    image: mkabaoglu/firewallapi:9.9.9
+    ports:
+      - "8001:8001"
+    links:
+      - db
+      - influxdb
+    environment:
+      - DATABASE_NAME=postgres
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+      - ALLOWED_HOSTS=10.10.101.110
+      - INFLUXDB_URL=http://influxdb:8086
+      - INFLUXDB_BUCKET=bucket
+      - INFLUXDB_TOKEN=h5O3dRfdMMqp2_6NcSquHjnA9HtKPnRXPwEsoOelT19nNI0F_tpaVZ8lWGo3XjASEm4gglZR9Q5fc3ehxDZjLg==
+      - INFLUXDB_ORG=firma_org
+    depends_on:
+      - db
+      - influxdb

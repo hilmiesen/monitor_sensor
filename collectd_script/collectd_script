@@ -4,7 +4,7 @@ r = redis.Redis(host='172.20.0.10', port=6379, db=0)
 
 data_to_send = {}
 
-HOST_V2 = "http://10.10.101.110:8001/v2/"
+APIGW_HOST = "http://10.10.101.110:8001/v2/"
 HEADERS = {"Authorization": "Token 32df5a48f27f912f4a2adbe0e1cc2ceb6559e429"}
 
 
@@ -41,7 +41,7 @@ def send_data():
             )
     
     requests.post(
-        HOST_V2, data=data_to_send, timeout=5, headers=HEADERS, verify=False
+        APIGW_HOST, data=data_to_send, timeout=5, headers=HEADERS, verify=False
     )  
     
 while(1):

@@ -1,7 +1,5 @@
-# MONITORING SENSOR
 
-
-## Kullanımı
+## Sensor Kullanımı
 
 
 * collectd: collectd.conf dosyası ile monitor edilenler redise yazılır

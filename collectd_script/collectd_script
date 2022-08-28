@@ -1,0 +1,49 @@
+#!/usr/bin/python3
+import requests, redis, json, time
+r = redis.Redis(host='172.20.0.10', port=6379, db=0)
+
+data_to_send = {}
+
+HOST_V2 = "http://10.10.101.110:8001/v2/"
+HEADERS = {"Authorization": "Token 32df5a48f27f912f4a2adbe0e1cc2ceb6559e429"}
+
+
+def send_data():
+    data_to_send["name"] = 'hilmi_pc'
+    data_to_send["serial"] = '12345'
+
+    for key in r.scan_iter("collectd/*/*"):
+     
+        key_list = key.decode().split("/")
+
+        if key_list[3] == "if_packets":
+            data_to_send["localhost/time/timestamp"] = (
+                r.zrange(key, 0, -1)[-1].decode().split(":")[0]
+            )
+            data_to_send[key.decode() + "_rx"] = (
+                r.zrange(key, 0, -1)[-1].decode().split(":")[1]
+            )
+            data_to_send[key.decode() + "_tx"] = (
+                r.zrange(key, 0, -1)[-1].decode().split(":")[2]
+            )
+
+        elif key_list[3] == "if_octets":
+            data_to_send[key.decode() + "_rx"] = (
+                r.zrange(key, 0, -1)[-1].decode().split(":")[1]
+            )
+            data_to_send[key.decode() + "_tx"] = (
+                r.zrange(key, 0, -1)[-1].decode().split(":")[2]
+            )
+
+        else:
+            data_to_send[key.decode()] = (
+                r.zrange(key, 0, -1)[-1].decode().split(":")[1]
+            )
+    
+    requests.post(
+        HOST_V2, data=data_to_send, timeout=5, headers=HEADERS, verify=False
+    )  
+    
+while(1):
+    send_data()  
+    time.sleep(10)      
